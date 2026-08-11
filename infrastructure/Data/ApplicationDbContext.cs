@@ -1,3 +1,4 @@
+using AssignmentSystem.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AssignmentSystem.Infrastructure.Data
@@ -8,6 +9,16 @@ namespace AssignmentSystem.Infrastructure.Data
         {
         }
 
-        // Entities will be added here in a later phase.
+        public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(e => e.Email).IsUnique();
+            });
+        }
     }
 }
