@@ -8,15 +8,13 @@ namespace AssignmentSystem.Infrastructure.Data
     {
         public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasherService passwordHasher)
         {
-            // Only seed if no users exist
-            if (await context.Users.AnyAsync())
-            {
-                return;
-            }
+            User admin = null;
+            User teacher = null;
+            User student = null;
 
-            var users = new List<User>
+            if (!await context.Users.AnyAsync())
             {
-                new User
+                admin = new User
                 {
                     Id = Guid.NewGuid(),
                     Name = "Admin User",
@@ -25,8 +23,9 @@ namespace AssignmentSystem.Infrastructure.Data
                     Role = "Admin",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow
-                },
-                new User
+                };
+
+                teacher = new User
                 {
                     Id = Guid.NewGuid(),
                     Name = "Teacher Demo",
@@ -35,8 +34,9 @@ namespace AssignmentSystem.Infrastructure.Data
                     Role = "Teacher",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow
-                },
-                new User
+                };
+
+                student = new User
                 {
                     Id = Guid.NewGuid(),
                     Name = "Student Demo",
@@ -45,11 +45,49 @@ namespace AssignmentSystem.Infrastructure.Data
                     Role = "Student",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow
-                }
-            };
+                };
 
-            await context.Users.AddRangeAsync(users);
-            await context.SaveChangesAsync();
+                await context.Users.AddRangeAsync(admin, teacher, student);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                teacher = await context.Users.FirstOrDefaultAsync(u => u.Email == "teacher@example.com");
+                student = await context.Users.FirstOrDefaultAsync(u => u.Email == "student@example.com");
+            }
+
+            if (!await context.Classes.AnyAsync() && teacher != null && student != null)
+            {
+                var mathClass = new Class { Id = Guid.NewGuid(), Name = "Year 10 Mathematics", Code = "Y10-MATH", Description = "Advanced Mathematics for Year 10" };
+                var scienceClass = new Class { Id = Guid.NewGuid(), Name = "Year 10 Science", Code = "Y10-SCI", Description = "General Science for Year 10" };
+                
+                await context.Classes.AddRangeAsync(mathClass, scienceClass);
+
+                var algebra = new Subject { Id = Guid.NewGuid(), Name = "Algebra", Code = "ALG101", Description = "Basic Algebra" };
+                var physics = new Subject { Id = Guid.NewGuid(), Name = "Physics", Code = "PHY101", Description = "Introductory Physics" };
+                
+                await context.Subjects.AddRangeAsync(algebra, physics);
+
+                var teacherAssignment = new TeacherAssignment
+                {
+                    Id = Guid.NewGuid(),
+                    TeacherId = teacher.Id,
+                    ClassId = mathClass.Id,
+                    SubjectId = algebra.Id
+                };
+
+                await context.TeacherAssignments.AddAsync(teacherAssignment);
+
+                var studentEnrollment = new StudentClass
+                {
+                    StudentId = student.Id,
+                    ClassId = mathClass.Id
+                };
+
+                await context.StudentClasses.AddAsync(studentEnrollment);
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
