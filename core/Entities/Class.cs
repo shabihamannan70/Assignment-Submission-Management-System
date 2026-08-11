@@ -13,5 +13,6 @@ namespace AssignmentSystem.Core.Entities
 
         public ICollection<TeacherAssignment> TeacherAssignments { get; set; } = new List<TeacherAssignment>();
         public ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
+        public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
     }
 }

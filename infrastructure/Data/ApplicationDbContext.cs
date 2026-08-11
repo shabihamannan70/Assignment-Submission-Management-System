@@ -14,6 +14,7 @@ namespace AssignmentSystem.Infrastructure.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<TeacherAssignment> TeacherAssignments { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +67,30 @@ namespace AssignmentSystem.Infrastructure.Data
                 entity.HasOne(e => e.Class)
                       .WithMany(c => c.StudentClasses)
                       .HasForeignKey(e => e.ClassId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Assignment>(entity =>
+            {
+                entity.HasIndex(e => e.TeacherId);
+                entity.HasIndex(e => e.ClassId);
+                entity.HasIndex(e => e.SubjectId);
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.Deadline);
+
+                entity.HasOne(e => e.Teacher)
+                      .WithMany(u => u.Assignments)
+                      .HasForeignKey(e => e.TeacherId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Class)
+                      .WithMany(c => c.Assignments)
+                      .HasForeignKey(e => e.ClassId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Subject)
+                      .WithMany(s => s.Assignments)
+                      .HasForeignKey(e => e.SubjectId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }
