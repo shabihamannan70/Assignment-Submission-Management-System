@@ -8,4 +8,7 @@
   <Folder Name="/infrastructure/">
     <Project Path="infrastructure/AssignmentSystem.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AssignmentSystem.Tests/AssignmentSystem.Tests.csproj" />
+  </Folder>
 </Solution>
