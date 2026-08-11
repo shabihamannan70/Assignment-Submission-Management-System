@@ -1,0 +1,15 @@
+C:\Users\ERA\Desktop\New folder\infrastructure\bin\Debug\net10.0\AssignmentSystem.Infrastructure.deps.json
+C:\Users\ERA\Desktop\New folder\infrastructure\bin\Debug\net10.0\AssignmentSystem.Infrastructure.dll
+C:\Users\ERA\Desktop\New folder\infrastructure\bin\Debug\net10.0\AssignmentSystem.Infrastructure.pdb
+C:\Users\ERA\Desktop\New folder\infrastructure\bin\Debug\net10.0\AssignmentSystem.Core.dll
+C:\Users\ERA\Desktop\New folder\infrastructure\bin\Debug\net10.0\AssignmentSystem.Core.pdb
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.AssemblyInfo.cs
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\Assignme.9A135E6F.Up2Date
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.dll
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\refint\AssignmentSystem.Infrastructure.dll
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\AssignmentSystem.Infrastructure.pdb
+C:\Users\ERA\Desktop\New folder\infrastructure\obj\Debug\net10.0\ref\AssignmentSystem.Infrastructure.dll

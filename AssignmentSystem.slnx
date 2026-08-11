@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/api/">
+    <Project Path="api/AssignmentSystem.Api.csproj" />
+  </Folder>
+  <Folder Name="/core/">
+    <Project Path="core/AssignmentSystem.Core.csproj" />
+  </Folder>
+  <Folder Name="/infrastructure/">
+    <Project Path="infrastructure/AssignmentSystem.Infrastructure.csproj" />
+  </Folder>
+</Solution>
