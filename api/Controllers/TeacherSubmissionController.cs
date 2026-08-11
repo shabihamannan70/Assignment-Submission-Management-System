@@ -33,41 +33,25 @@ namespace AssignmentSystem.Api.Controllers
         [HttpGet("assignments/{assignmentId}/submissions")]
         public async Task<IActionResult> GetSubmissionsForAssignment(Guid assignmentId)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var submissions = await _submissionService.GetSubmissionsForAssignmentAsync(teacherId, assignmentId);
-                return Ok(submissions);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
+            var teacherId = GetUserId();
+            var submissions = await _submissionService.GetSubmissionsForAssignmentAsync(teacherId, assignmentId);
+            return Ok(submissions);
         }
 
         [HttpGet("submissions/{submissionId}")]
         public async Task<IActionResult> GetSubmission(Guid submissionId)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var submission = await _submissionService.GetSubmissionForTeacherAsync(teacherId, submissionId);
-                return Ok(submission);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
+            var teacherId = GetUserId();
+            var submission = await _submissionService.GetSubmissionForTeacherAsync(teacherId, submissionId);
+            return Ok(submission);
         }
 
         [HttpPut("submissions/{submissionId}/grade")]
         public async Task<IActionResult> GradeSubmission(Guid submissionId, [FromBody] GradeSubmissionDto dto)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var result = await _submissionService.GradeSubmissionAsync(teacherId, submissionId, dto);
-                return Ok(result);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
-            catch (ArgumentException ex) { return BadRequest(ex.Message); }
+            var teacherId = GetUserId();
+            var result = await _submissionService.GradeSubmissionAsync(teacherId, submissionId, dto);
+            return Ok(result);
         }
     }
 }

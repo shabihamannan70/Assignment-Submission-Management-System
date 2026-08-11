@@ -9,32 +9,35 @@ using AssignmentSystem.Core.Enums;
 using AssignmentSystem.Core.Interfaces;
 using AssignmentSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AssignmentSystem.Infrastructure.Services
 {
     public class SubmissionService : ISubmissionService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<SubmissionService> _logger;
 
-        public SubmissionService(ApplicationDbContext context)
+        public SubmissionService(ApplicationDbContext context, ILogger<SubmissionService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         private async Task ValidateAssignmentAndMembershipAsync(Guid studentId, Guid assignmentId)
         {
             var assignment = await _context.Assignments.FindAsync(assignmentId);
             if (assignment == null)
-                throw new Exception("NOT_FOUND");
+                throw new KeyNotFoundException("Assignment not found.");
             
             if (assignment.Status != AssignmentStatus.Published)
-                throw new Exception("NOT_FOUND");
+                throw new InvalidOperationException("Assignment not found or not published.");
 
             var isEnrolled = await _context.StudentClasses
                 .AnyAsync(sc => sc.StudentId == studentId && sc.ClassId == assignment.ClassId);
 
             if (!isEnrolled)
-                throw new Exception("FORBIDDEN");
+                throw new UnauthorizedAccessException("Cannot submit to this assignment.");
         }
 
         public async Task<IEnumerable<StudentAssignmentDto>> GetStudentAssignmentsAsync(Guid studentId)
@@ -67,7 +70,7 @@ namespace AssignmentSystem.Infrastructure.Services
             {
                 await ValidateAssignmentAndMembershipAsync(studentId, assignmentId);
             }
-            catch (Exception ex) when (ex.Message == "NOT_FOUND" || ex.Message == "FORBIDDEN")
+            catch (Exception ex) when (ex is KeyNotFoundException || ex is InvalidOperationException || ex is UnauthorizedAccessException)
             {
                 return null;
             }
@@ -102,18 +105,7 @@ namespace AssignmentSystem.Infrastructure.Services
 
         public async Task<SubmissionDto> SubmitAnswerAsync(Guid studentId, CreateSubmissionDto dto)
         {
-            try
-            {
-                await ValidateAssignmentAndMembershipAsync(studentId, dto.AssignmentId);
-            }
-            catch (Exception ex) when (ex.Message == "FORBIDDEN")
-            {
-                throw new UnauthorizedAccessException("Cannot submit to this assignment.");
-            }
-            catch (Exception ex) when (ex.Message == "NOT_FOUND")
-            {
-                throw new InvalidOperationException("Assignment not found or not published.");
-            }
+            await ValidateAssignmentAndMembershipAsync(studentId, dto.AssignmentId);
 
             var assignment = await _context.Assignments.FindAsync(dto.AssignmentId);
             if (DateTimeOffset.UtcNow > assignment!.Deadline)
@@ -127,10 +119,11 @@ namespace AssignmentSystem.Infrastructure.Services
 
             if (existingSubmission != null)
             {
-                // Upsert behavior
                 existingSubmission.Answer = dto.Answer;
                 existingSubmission.UpdatedAt = DateTimeOffset.UtcNow;
                 await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Submission updated successfully. SubmissionId: {SubmissionId}, StudentId: {StudentId}", existingSubmission.Id, studentId);
                 return MapToDto(existingSubmission);
             }
 
@@ -146,6 +139,9 @@ namespace AssignmentSystem.Infrastructure.Services
 
             _context.Submissions.Add(newSubmission);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Submission created successfully. SubmissionId: {SubmissionId}, StudentId: {StudentId}", newSubmission.Id, studentId);
+
             return MapToDto(newSubmission);
         }
 
@@ -164,6 +160,9 @@ namespace AssignmentSystem.Infrastructure.Services
             submission.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Submission updated successfully. SubmissionId: {SubmissionId}, StudentId: {StudentId}", submission.Id, studentId);
+
             return MapToDto(submission);
         }
 
@@ -222,6 +221,8 @@ namespace AssignmentSystem.Infrastructure.Services
             _context.SubmissionAttachments.Add(attachment);
             await _context.SaveChangesAsync();
 
+            _logger.LogInformation("Attachment uploaded successfully. AttachmentId: {AttachmentId}, SubmissionId: {SubmissionId}", attachment.Id, submissionId);
+
             return new SubmissionAttachmentDto(
                 attachment.Id,
                 attachment.FileName,
@@ -253,6 +254,8 @@ namespace AssignmentSystem.Infrastructure.Services
 
             _context.SubmissionAttachments.Remove(attachment);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Attachment deleted successfully. AttachmentId: {AttachmentId}, SubmissionId: {SubmissionId}", attachmentId, submissionId);
         }
 
         public async Task<IEnumerable<SubmissionDto>> GetSubmissionsForAssignmentAsync(Guid teacherId, Guid assignmentId)
@@ -300,6 +303,9 @@ namespace AssignmentSystem.Infrastructure.Services
             submission.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Submission graded successfully. SubmissionId: {SubmissionId}, TeacherId: {TeacherId}, Marks: {Marks}", submission.Id, teacherId, dto.Marks);
+
             return MapToDto(submission);
         }
 

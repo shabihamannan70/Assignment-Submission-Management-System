@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using AssignmentSystem.Core.Enums;
 
 namespace AssignmentSystem.Core.DTOs
@@ -29,7 +30,7 @@ namespace AssignmentSystem.Core.DTOs
     );
 
     public record CreateSubmissionDto(
-        Guid AssignmentId,
+        [Required] Guid AssignmentId,
         string? Answer
     );
 
@@ -59,7 +60,7 @@ namespace AssignmentSystem.Core.DTOs
     );
 
     public record GradeSubmissionDto(
-        decimal Marks,
+        [Range(0, double.MaxValue, ErrorMessage = "Marks cannot be negative.")] decimal Marks,
         string? Feedback
     );
 }

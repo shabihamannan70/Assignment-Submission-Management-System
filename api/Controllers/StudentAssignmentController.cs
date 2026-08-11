@@ -29,32 +29,18 @@ namespace AssignmentSystem.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMyAssignments()
         {
-            try
-            {
-                var studentId = GetStudentId();
-                var assignments = await _submissionService.GetStudentAssignmentsAsync(studentId);
-                return Ok(assignments);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            var assignments = await _submissionService.GetStudentAssignmentsAsync(studentId);
+            return Ok(assignments);
         }
 
         [HttpGet("{assignmentId}")]
         public async Task<IActionResult> GetAssignmentDetails(Guid assignmentId)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                var details = await _submissionService.GetStudentAssignmentDetailsAsync(studentId, assignmentId);
-                if (details == null) return NotFound("Assignment not found or access denied.");
-                return Ok(details);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            var details = await _submissionService.GetStudentAssignmentDetailsAsync(studentId, assignmentId);
+            if (details == null) return NotFound("Assignment not found or access denied.");
+            return Ok(details);
         }
     }
 }

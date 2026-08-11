@@ -33,15 +33,9 @@ namespace AssignmentSystem.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAssignment([FromBody] CreateAssignmentDto dto)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var result = await _assignmentService.CreateAssignmentAsync(teacherId, dto);
-                return CreatedAtAction(nameof(GetAssignment), new { id = result.Id }, result);
-            }
-            catch (ArgumentException ex) { return BadRequest(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
-            catch (Exception ex) { return BadRequest(ex.Message); }
+            var teacherId = GetUserId();
+            var result = await _assignmentService.CreateAssignmentAsync(teacherId, dto);
+            return CreatedAtAction(nameof(GetAssignment), new { id = result.Id }, result);
         }
 
         [HttpGet("my")]
@@ -55,55 +49,33 @@ namespace AssignmentSystem.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAssignment(Guid id)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var result = await _assignmentService.GetAssignmentAsync(teacherId, id);
-                return Ok(result);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
+            var teacherId = GetUserId();
+            var result = await _assignmentService.GetAssignmentAsync(teacherId, id);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAssignment(Guid id, [FromBody] UpdateAssignmentDto dto)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var result = await _assignmentService.UpdateAssignmentAsync(teacherId, id, dto);
-                return Ok(result);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
-            catch (ArgumentException ex) { return BadRequest(ex.Message); }
+            var teacherId = GetUserId();
+            var result = await _assignmentService.UpdateAssignmentAsync(teacherId, id, dto);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssignment(Guid id)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                await _assignmentService.DeleteAssignmentAsync(teacherId, id);
-                return NoContent();
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
+            var teacherId = GetUserId();
+            await _assignmentService.DeleteAssignmentAsync(teacherId, id);
+            return NoContent();
         }
 
         [HttpPost("{id}/publish")]
         public async Task<IActionResult> PublishAssignment(Guid id)
         {
-            try
-            {
-                var teacherId = GetUserId();
-                var result = await _assignmentService.PublishAssignmentAsync(teacherId, id);
-                return Ok(result);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException ex) { return NotFound(ex.Message); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, ex.Message); }
-            catch (ArgumentException ex) { return BadRequest(ex.Message); }
+            var teacherId = GetUserId();
+            var result = await _assignmentService.PublishAssignmentAsync(teacherId, id);
+            return Ok(result);
         }
     }
 }

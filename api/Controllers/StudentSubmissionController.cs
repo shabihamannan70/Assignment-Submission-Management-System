@@ -31,108 +31,53 @@ namespace AssignmentSystem.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAnswer([FromBody] CreateSubmissionDto dto)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                var submission = await _submissionService.SubmitAnswerAsync(studentId, dto);
-                // Return 201 Created. The route to GET is below.
-                return CreatedAtAction(nameof(GetSubmission), new { submissionId = submission.Id }, submission);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            var submission = await _submissionService.SubmitAnswerAsync(studentId, dto);
+            // Return 201 Created. The route to GET is below.
+            return CreatedAtAction(nameof(GetSubmission), new { submissionId = submission.Id }, submission);
         }
 
         [HttpGet("{submissionId}")]
         public async Task<IActionResult> GetSubmission(Guid submissionId)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                var submission = await _submissionService.GetSubmissionAsync(studentId, submissionId);
-                if (submission == null) return NotFound("Submission not found.");
-                return Ok(submission);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            var submission = await _submissionService.GetSubmissionAsync(studentId, submissionId);
+            if (submission == null) return NotFound("Submission not found.");
+            return Ok(submission);
         }
 
         [HttpPut("{submissionId}")]
         public async Task<IActionResult> UpdateSubmission(Guid submissionId, [FromBody] UpdateSubmissionDto dto)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                var submission = await _submissionService.UpdateSubmissionAsync(studentId, submissionId, dto);
-                return Ok(submission);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            var submission = await _submissionService.UpdateSubmissionAsync(studentId, submissionId, dto);
+            return Ok(submission);
         }
 
         [HttpPost("{submissionId}/attachments")]
         public async Task<IActionResult> UploadAttachment(Guid submissionId, IFormFile file)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                if (file == null || file.Length == 0) return BadRequest("File is empty.");
+            var studentId = GetStudentId();
+            if (file == null || file.Length == 0) return BadRequest("File is empty.");
 
-                using var stream = file.OpenReadStream();
-                var attachment = await _submissionService.UploadAttachmentAsync(
-                    studentId, 
-                    submissionId, 
-                    file.FileName, 
-                    file.ContentType, 
-                    file.Length, 
-                    stream);
-                
-                return Ok(attachment);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            using var stream = file.OpenReadStream();
+            var attachment = await _submissionService.UploadAttachmentAsync(
+                studentId, 
+                submissionId, 
+                file.FileName, 
+                file.ContentType, 
+                file.Length, 
+                stream);
+            
+            return Ok(attachment);
         }
 
         [HttpDelete("{submissionId}/attachments/{attachmentId}")]
         public async Task<IActionResult> DeleteAttachment(Guid submissionId, Guid attachmentId)
         {
-            try
-            {
-                var studentId = GetStudentId();
-                await _submissionService.DeleteAttachmentAsync(studentId, submissionId, attachmentId);
-                return NoContent();
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var studentId = GetStudentId();
+            await _submissionService.DeleteAttachmentAsync(studentId, submissionId, attachmentId);
+            return NoContent();
         }
     }
 }

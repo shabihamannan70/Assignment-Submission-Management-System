@@ -8,16 +8,19 @@ using AssignmentSystem.Core.Enums;
 using AssignmentSystem.Core.Interfaces;
 using AssignmentSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AssignmentSystem.Infrastructure.Services
 {
     public class AssignmentService : IAssignmentService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AssignmentService> _logger;
 
-        public AssignmentService(ApplicationDbContext context)
+        public AssignmentService(ApplicationDbContext context, ILogger<AssignmentService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<AssignmentDto> CreateAssignmentAsync(Guid teacherId, CreateAssignmentDto dto)
@@ -51,6 +54,8 @@ namespace AssignmentSystem.Infrastructure.Services
             _context.Assignments.Add(assignment);
             await _context.SaveChangesAsync();
 
+            _logger.LogInformation("Assignment created successfully. AssignmentId: {AssignmentId}, TeacherId: {TeacherId}", assignment.Id, teacherId);
+
             return MapToDto(assignment);
         }
 
@@ -66,8 +71,6 @@ namespace AssignmentSystem.Infrastructure.Services
             if (dto.MaximumMarks <= 0)
                 throw new ArgumentException("Maximum marks must be greater than zero.");
             
-            // Only validate deadline if it changed, to allow updating title/desc of an old assignment 
-            // Wait, the requirement says "A newly supplied Deadline must be in the future".
             if (dto.Deadline != assignment.Deadline && dto.Deadline <= DateTimeOffset.UtcNow)
                 throw new ArgumentException("Deadline must be in the future.");
 
@@ -78,6 +81,8 @@ namespace AssignmentSystem.Infrastructure.Services
             assignment.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Assignment updated successfully. AssignmentId: {AssignmentId}, TeacherId: {TeacherId}", assignment.Id, teacherId);
 
             return MapToDto(assignment);
         }
@@ -93,6 +98,8 @@ namespace AssignmentSystem.Infrastructure.Services
 
             _context.Assignments.Remove(assignment);
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Assignment deleted successfully. AssignmentId: {AssignmentId}, TeacherId: {TeacherId}", assignmentId, teacherId);
         }
 
         public async Task<AssignmentDto> PublishAssignmentAsync(Guid teacherId, Guid assignmentId)
@@ -127,6 +134,8 @@ namespace AssignmentSystem.Infrastructure.Services
             assignment.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Assignment published successfully. AssignmentId: {AssignmentId}, TeacherId: {TeacherId}", assignment.Id, teacherId);
 
             return MapToDto(assignment);
         }

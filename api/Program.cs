@@ -5,11 +5,39 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AssignmentSystem.Core.Interfaces;
 using AssignmentSystem.Infrastructure.Services;
+using AssignmentSystem.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Mvc;
+using AssignmentSystem.Core.DTOs;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value.Errors.Count > 0)
+                .Select(e => new ApiErrorField
+                {
+                    Field = char.ToLowerInvariant(e.Key[0]) + e.Key.Substring(1),
+                    Message = e.Value.Errors.First().ErrorMessage
+                })
+                .ToList();
+
+            var response = new ApiErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Validation failed.",
+                Errors = errors,
+                TraceId = context.HttpContext.TraceIdentifier
+            };
+
+            return new BadRequestObjectResult(response);
+        };
+    });
 
 // Configure Entity Framework Core with PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
@@ -20,6 +48,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add Authentication Services
 builder.Services.AddScoped<IPasswordHasherService, BcryptPasswordHasherService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 
@@ -64,6 +94,8 @@ if (app.Environment.IsDevelopment())
         await DatabaseSeeder.SeedAsync(context, hasher);
     }
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
