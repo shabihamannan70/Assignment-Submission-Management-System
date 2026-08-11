@@ -255,6 +255,54 @@ namespace AssignmentSystem.Infrastructure.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<SubmissionDto>> GetSubmissionsForAssignmentAsync(Guid teacherId, Guid assignmentId)
+        {
+            var assignment = await _context.Assignments.FindAsync(assignmentId);
+            if (assignment == null) throw new KeyNotFoundException("Assignment not found.");
+            if (assignment.TeacherId != teacherId) throw new UnauthorizedAccessException("Not authorized to view submissions for this assignment.");
+
+            var submissions = await _context.Submissions
+                .Include(s => s.Attachments)
+                .Where(s => s.AssignmentId == assignmentId)
+                .ToListAsync();
+
+            return submissions.Select(MapToDto);
+        }
+
+        public async Task<SubmissionDto> GetSubmissionForTeacherAsync(Guid teacherId, Guid submissionId)
+        {
+            var submission = await _context.Submissions
+                .Include(s => s.Assignment)
+                .Include(s => s.Attachments)
+                .FirstOrDefaultAsync(s => s.Id == submissionId);
+
+            if (submission == null) throw new KeyNotFoundException("Submission not found.");
+            if (submission.Assignment.TeacherId != teacherId) throw new UnauthorizedAccessException("Not authorized to view this submission.");
+
+            return MapToDto(submission);
+        }
+
+        public async Task<SubmissionDto> GradeSubmissionAsync(Guid teacherId, Guid submissionId, GradeSubmissionDto dto)
+        {
+            var submission = await _context.Submissions
+                .Include(s => s.Assignment)
+                .Include(s => s.Attachments)
+                .FirstOrDefaultAsync(s => s.Id == submissionId);
+
+            if (submission == null) throw new KeyNotFoundException("Submission not found.");
+            if (submission.Assignment.TeacherId != teacherId) throw new UnauthorizedAccessException("Not authorized to grade this submission.");
+            if (dto.Marks < 0) throw new ArgumentException("Marks cannot be negative.");
+            if (dto.Marks > submission.Assignment.MaximumMarks) throw new ArgumentException($"Marks cannot exceed the maximum marks ({submission.Assignment.MaximumMarks}).");
+
+            submission.Marks = dto.Marks;
+            submission.Feedback = dto.Feedback;
+            submission.Status = SubmissionStatus.Graded;
+            submission.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return MapToDto(submission);
+        }
+
         private static SubmissionDto MapToDto(Submission submission)
         {
             return new SubmissionDto(

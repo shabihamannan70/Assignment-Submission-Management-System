@@ -57,4 +57,9 @@ namespace AssignmentSystem.Core.DTOs
         long FileSize,
         DateTimeOffset UploadedAt
     );
+
+    public record GradeSubmissionDto(
+        decimal Marks,
+        string? Feedback
+    );
 }

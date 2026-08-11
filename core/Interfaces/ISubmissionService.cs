@@ -21,5 +21,11 @@ namespace AssignmentSystem.Core.Interfaces
         Task<SubmissionAttachmentDto> UploadAttachmentAsync(Guid studentId, Guid submissionId, string fileName, string contentType, long fileSize, Stream fileStream);
         
         Task DeleteAttachmentAsync(Guid studentId, Guid submissionId, Guid attachmentId);
+
+        Task<IEnumerable<SubmissionDto>> GetSubmissionsForAssignmentAsync(Guid teacherId, Guid assignmentId);
+        
+        Task<SubmissionDto> GetSubmissionForTeacherAsync(Guid teacherId, Guid submissionId);
+        
+        Task<SubmissionDto> GradeSubmissionAsync(Guid teacherId, Guid submissionId, GradeSubmissionDto dto);
     }
 }
