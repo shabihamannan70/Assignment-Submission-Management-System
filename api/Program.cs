@@ -21,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add Authentication Services
 builder.Services.AddScoped<IPasswordHasherService, BcryptPasswordHasherService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 
 builder.Services.AddAuthentication(options =>
 {
