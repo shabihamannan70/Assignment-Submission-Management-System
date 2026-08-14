@@ -33,7 +33,7 @@ This project is a comprehensive role-based Assignment and Submission Management 
 - Aggregate Dashboard displaying "Total assignments", "Pending", "Submitted", "Graded", and "Average marks" statistics
 
 ## 3. Assignment Lifecycle
-1. **Teacher creates assignment** (Status: Draft)
+1. **Teacher creates assignment** (Status: Draft/Publish)
 2. **Teacher publishes assignment**
 3. **Enrolled students see assignment**
 4. **Student submits answer/file** (Status: Submitted)
