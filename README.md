@@ -197,13 +197,18 @@ Users are uniquely identified by a UUID generated upon creation. If multiple use
 - **Resubmission**: Updates simply overwrite the existing answer and attachment record safely.
 - **Grading Lock**: Once a teacher applies a grade, the submission is strictly locked preventing further edits by the student or the teacher.
 
-## 22. Troubleshooting
+## 22. Known Limitations
+- Uploads are currently saved to the local file system (api/uploads). In a multi-instance production environment, a distributed storage solution (like AWS S3 or Azure Blob Storage) would be necessary.
+- Password reset functionality via email is not currently implemented.
+- Email notifications for assignment publishing and grading are not integrated.
+
+## 23. Troubleshooting
 - **API not running**: Check if PostgreSQL is running and credentials in `appsettings.json` are correct.
 - **Database Connection Failure**: The backend will crash on startup if `DefaultConnection` is invalid. Ensure your DB user has create privileges for EF Migrations.
 - **Frontend API URL Mismatch**: Ensure `NEXT_PUBLIC_API_BASE_URL` in `frontend/.env.local` accurately points to your local `.NET` server port (typically 5104).
 - **Migration Issues**: If the database schema is out of sync, delete the existing database and run `dotnet ef database update`.
 
-## 23. Build Verification
+## 24. Build Verification
 ```bash
 # Backend Verification
 dotnet build
@@ -217,5 +222,5 @@ npm run build
 # Expected: "Compiled successfully", "Generating static pages"
 ```
 
-## 24. License / Academic Note
+## 25. License / Academic Note
 This project is submitted as an academic/recruitment assignment demonstration.
