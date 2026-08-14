@@ -8,9 +8,12 @@ namespace AssignmentSystem.Core.DTOs
     public record StudentAssignmentDto(
         Guid Id,
         string Title,
+        string Description,
         Guid ClassId,
         Guid SubjectId,
+        string SubjectName,
         Guid TeacherId,
+        string TeacherName,
         DateTimeOffset Deadline,
         int MaximumMarks,
         DateTimeOffset CreatedAt
@@ -22,11 +25,14 @@ namespace AssignmentSystem.Core.DTOs
         string Description,
         Guid ClassId,
         Guid SubjectId,
+        string SubjectName,
         Guid TeacherId,
+        string TeacherName,
         DateTimeOffset Deadline,
         int MaximumMarks,
         DateTimeOffset CreatedAt,
-        SubmissionDto? Submission
+        SubmissionDto? Submission,
+        IEnumerable<AssignmentAttachmentDto>? TeacherAttachments = null
     );
 
     public record CreateSubmissionDto(
@@ -42,6 +48,8 @@ namespace AssignmentSystem.Core.DTOs
         Guid Id,
         Guid AssignmentId,
         Guid StudentId,
+        string? StudentName,
+        string? StudentEmail,
         string? Answer,
         DateTimeOffset SubmittedAt,
         DateTimeOffset? UpdatedAt,

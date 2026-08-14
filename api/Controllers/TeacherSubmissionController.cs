@@ -22,7 +22,8 @@ namespace AssignmentSystem.Api.Controllers
 
         private Guid GetUserId()
         {
-            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
             {
                 throw new UnauthorizedAccessException("User ID is missing from token.");
@@ -31,10 +32,10 @@ namespace AssignmentSystem.Api.Controllers
         }
 
         [HttpGet("assignments/{assignmentId}/submissions")]
-        public async Task<IActionResult> GetSubmissionsForAssignment(Guid assignmentId)
+        public async Task<IActionResult> GetSubmissionsForAssignment(Guid assignmentId, [FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var teacherId = GetUserId();
-            var submissions = await _submissionService.GetSubmissionsForAssignmentAsync(teacherId, assignmentId);
+            var submissions = await _submissionService.GetSubmissionsForAssignmentAsync(teacherId, assignmentId, search, page, pageSize);
             return Ok(submissions);
         }
 

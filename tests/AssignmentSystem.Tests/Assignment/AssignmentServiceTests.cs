@@ -175,5 +175,47 @@ namespace AssignmentSystem.Tests.Assignment
             // Assert
             Assert.Equal(AssignmentStatus.Published, result.Status);
         }
+
+        [Fact]
+        public async Task GetMyAssignments_ReturnsOnlyOwnAssignments()
+        {
+            // Arrange
+            var teacherId1 = Guid.NewGuid();
+            var teacherId2 = Guid.NewGuid();
+            var classId = Guid.NewGuid();
+            var subjectId = Guid.NewGuid();
+
+            _context.Users.Add(new User { Id = teacherId1, Name = "T1", Email = "t1@test.com", Role = "Teacher", PasswordHash = "hash" });
+            _context.Users.Add(new User { Id = teacherId2, Name = "T2", Email = "t2@test.com", Role = "Teacher", PasswordHash = "hash" });
+            _context.Classes.Add(new Class { Id = classId, Name = "C1", Code = "C1" });
+            _context.Subjects.Add(new Subject { Id = subjectId, Name = "S1", Code = "S1" });
+            await _context.SaveChangesAsync();
+
+            var assignment1 = new Core.Entities.Assignment { Id = Guid.NewGuid(), TeacherId = teacherId1, ClassId = classId, SubjectId = subjectId, Title = "A1" };
+            var assignment2 = new Core.Entities.Assignment { Id = Guid.NewGuid(), TeacherId = teacherId2, ClassId = classId, SubjectId = subjectId, Title = "A2" };
+            _context.Assignments.AddRange(assignment1, assignment2);
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _assignmentService.GetMyAssignmentsAsync(teacherId1);
+
+            // Assert
+            Assert.Single(result.Items);
+            Assert.Equal("A1", result.Items.First().Title);
+        }
+
+        [Fact]
+        public async Task GetAssignment_OtherTeachersAssignment_ThrowsUnauthorizedAccessException()
+        {
+            // Arrange
+            var teacherId1 = Guid.NewGuid();
+            var teacherId2 = Guid.NewGuid();
+            var assignment = new Core.Entities.Assignment { Id = Guid.NewGuid(), TeacherId = teacherId1, Title = "A1" };
+            _context.Assignments.Add(assignment);
+            await _context.SaveChangesAsync();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _assignmentService.GetAssignmentAsync(teacherId2, assignment.Id));
+        }
     }
 }

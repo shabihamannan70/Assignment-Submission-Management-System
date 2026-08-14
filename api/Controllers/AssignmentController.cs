@@ -22,7 +22,8 @@ namespace AssignmentSystem.Api.Controllers
 
         private Guid GetUserId()
         {
-            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
             {
                 throw new UnauthorizedAccessException("User ID is missing from token.");
@@ -39,10 +40,10 @@ namespace AssignmentSystem.Api.Controllers
         }
 
         [HttpGet("my")]
-        public async Task<IActionResult> GetMyAssignments()
+        public async Task<IActionResult> GetMyAssignments([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var teacherId = GetUserId();
-            var assignments = await _assignmentService.GetMyAssignmentsAsync(teacherId);
+            var assignments = await _assignmentService.GetMyAssignmentsAsync(teacherId, search, page, pageSize);
             return Ok(assignments);
         }
 
@@ -76,6 +77,40 @@ namespace AssignmentSystem.Api.Controllers
             var teacherId = GetUserId();
             var result = await _assignmentService.PublishAssignmentAsync(teacherId, id);
             return Ok(result);
+        }
+
+        [HttpPatch("{id}/toggle-status")]
+        public async Task<IActionResult> ToggleAssignmentStatus(Guid id)
+        {
+            var teacherId = GetUserId();
+            var result = await _assignmentService.ToggleAssignmentStatusAsync(teacherId, id);
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/attachments")]
+        public async Task<IActionResult> UploadAttachment(Guid id, Microsoft.AspNetCore.Http.IFormFile file)
+        {
+            var teacherId = GetUserId();
+            if (file == null || file.Length == 0) return BadRequest("File is empty.");
+
+            using var stream = file.OpenReadStream();
+            var attachment = await _assignmentService.UploadAttachmentAsync(
+                teacherId, 
+                id, 
+                file.FileName, 
+                file.ContentType, 
+                file.Length, 
+                stream);
+            
+            return Ok(attachment);
+        }
+
+        [HttpDelete("{id}/attachments/{attachmentId}")]
+        public async Task<IActionResult> DeleteAttachment(Guid id, Guid attachmentId)
+        {
+            var teacherId = GetUserId();
+            await _assignmentService.DeleteAttachmentAsync(teacherId, id, attachmentId);
+            return NoContent();
         }
     }
 }

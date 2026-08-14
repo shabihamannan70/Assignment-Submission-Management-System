@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using AssignmentSystem.Core.Enums;
 
@@ -10,7 +11,8 @@ namespace AssignmentSystem.Core.DTOs
         [Required] Guid ClassId, 
         [Required] Guid SubjectId, 
         [Required] DateTimeOffset Deadline, 
-        [Range(1, int.MaxValue, ErrorMessage = "Maximum marks must be greater than zero.")] int MaximumMarks
+        [Range(1, int.MaxValue, ErrorMessage = "Maximum marks must be greater than zero.")] int MaximumMarks,
+        AssignmentStatus Status = AssignmentStatus.Draft
     );
     
     public record UpdateAssignmentDto(
@@ -20,5 +22,5 @@ namespace AssignmentSystem.Core.DTOs
         [Range(1, int.MaxValue, ErrorMessage = "Maximum marks must be greater than zero.")] int MaximumMarks
     );
     
-    public record AssignmentDto(Guid Id, string Title, string Description, Guid ClassId, Guid SubjectId, Guid TeacherId, DateTimeOffset Deadline, int MaximumMarks, AssignmentStatus Status, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
+    public record AssignmentDto(Guid Id, string Title, string Description, Guid ClassId, Guid SubjectId, Guid TeacherId, DateTimeOffset Deadline, int MaximumMarks, AssignmentStatus Status, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt, IEnumerable<AssignmentAttachmentDto>? Attachments = null);
 }

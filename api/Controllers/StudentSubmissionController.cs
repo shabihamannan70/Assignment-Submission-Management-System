@@ -23,7 +23,8 @@ namespace AssignmentSystem.Api.Controllers
 
         private Guid GetStudentId()
         {
-            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                ?? User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (Guid.TryParse(idStr, out var id)) return id;
             throw new UnauthorizedAccessException("Invalid student token.");
         }

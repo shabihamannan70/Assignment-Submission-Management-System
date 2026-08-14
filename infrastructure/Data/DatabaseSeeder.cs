@@ -1,25 +1,30 @@
 using AssignmentSystem.Core.Entities;
 using AssignmentSystem.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace AssignmentSystem.Infrastructure.Data
 {
     public static class DatabaseSeeder
     {
-        public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasherService passwordHasher)
+        public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasherService passwordHasher, IConfiguration configuration)
         {
-            User admin = null;
-            User teacher = null;
-            User student = null;
+            User? admin = null;
+            User? teacher = null;
+            User? student = null;
 
             if (!await context.Users.AnyAsync())
             {
+                var adminPassword = configuration["DemoAccounts:AdminPassword"] ?? throw new InvalidOperationException("Missing DemoAccounts:AdminPassword in configuration.");
+                var teacherPassword = configuration["DemoAccounts:TeacherPassword"] ?? throw new InvalidOperationException("Missing DemoAccounts:TeacherPassword in configuration.");
+                var studentPassword = configuration["DemoAccounts:StudentPassword"] ?? throw new InvalidOperationException("Missing DemoAccounts:StudentPassword in configuration.");
+
                 admin = new User
                 {
                     Id = Guid.NewGuid(),
                     Name = "Admin User",
                     Email = "admin@example.com".Trim().ToLowerInvariant(),
-                    PasswordHash = passwordHasher.HashPassword("Admin@123!"),
+                    PasswordHash = passwordHasher.HashPassword(adminPassword),
                     Role = "Admin",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow
@@ -30,7 +35,7 @@ namespace AssignmentSystem.Infrastructure.Data
                     Id = Guid.NewGuid(),
                     Name = "Teacher Demo",
                     Email = "teacher@example.com".Trim().ToLowerInvariant(),
-                    PasswordHash = passwordHasher.HashPassword("Teacher@123!"),
+                    PasswordHash = passwordHasher.HashPassword(teacherPassword),
                     Role = "Teacher",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow
@@ -41,7 +46,7 @@ namespace AssignmentSystem.Infrastructure.Data
                     Id = Guid.NewGuid(),
                     Name = "Student Demo",
                     Email = "student@example.com".Trim().ToLowerInvariant(),
-                    PasswordHash = passwordHasher.HashPassword("Student@123!"),
+                    PasswordHash = passwordHasher.HashPassword(studentPassword),
                     Role = "Student",
                     IsActive = true,
                     CreatedAt = DateTimeOffset.UtcNow

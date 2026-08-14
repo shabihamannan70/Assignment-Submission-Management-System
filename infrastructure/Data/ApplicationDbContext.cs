@@ -17,6 +17,7 @@ namespace AssignmentSystem.Infrastructure.Data
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<SubmissionAttachment> SubmissionAttachments { get; set; }
+        public DbSet<AssignmentAttachment> AssignmentAttachments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -115,6 +116,14 @@ namespace AssignmentSystem.Infrastructure.Data
                 entity.HasOne(e => e.Submission)
                       .WithMany(s => s.Attachments)
                       .HasForeignKey(e => e.SubmissionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<AssignmentAttachment>(entity =>
+            {
+                entity.HasOne(e => e.Assignment)
+                      .WithMany(a => a.Attachments)
+                      .HasForeignKey(e => e.AssignmentId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

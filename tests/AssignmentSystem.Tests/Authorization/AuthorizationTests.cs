@@ -19,11 +19,13 @@ namespace AssignmentSystem.Tests.Authorization
 {
     public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+#pragma warning disable CS0618
         public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
         }
+#pragma warning restore CS0618
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {

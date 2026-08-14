@@ -4,6 +4,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AssignmentSystem.Core.DTOs;
+using AssignmentSystem.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -46,6 +47,10 @@ namespace AssignmentSystem.Infrastructure.Middleware
                     break;
                 case KeyNotFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
+                    message = exception.Message;
+                    break;
+                case ConflictException:
+                    statusCode = (int)HttpStatusCode.Conflict;
                     message = exception.Message;
                     break;
                 case ArgumentException:

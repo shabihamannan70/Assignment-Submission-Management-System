@@ -27,5 +27,6 @@ namespace AssignmentSystem.Core.Entities
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         
         public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+        public ICollection<AssignmentAttachment> Attachments { get; set; } = new List<AssignmentAttachment>();
     }
 }

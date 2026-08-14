@@ -75,6 +75,44 @@ namespace AssignmentSystem.Infrastructure.Migrations
                     b.ToTable("Assignments");
                 });
 
+            modelBuilder.Entity("AssignmentSystem.Core.Entities.AssignmentAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("AssignmentAttachments");
+                });
+
             modelBuilder.Entity("AssignmentSystem.Core.Entities.Class", b =>
                 {
                     b.Property<Guid>("Id")
@@ -322,6 +360,17 @@ namespace AssignmentSystem.Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("AssignmentSystem.Core.Entities.AssignmentAttachment", b =>
+                {
+                    b.HasOne("AssignmentSystem.Core.Entities.Assignment", "Assignment")
+                        .WithMany("Attachments")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+                });
+
             modelBuilder.Entity("AssignmentSystem.Core.Entities.StudentClass", b =>
                 {
                     b.HasOne("AssignmentSystem.Core.Entities.Class", "Class")
@@ -400,6 +449,8 @@ namespace AssignmentSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("AssignmentSystem.Core.Entities.Assignment", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Submissions");
                 });
 
